@@ -17,3 +17,5 @@ runs:
       shell: bash
     - run: echo ${{inputs.bucket-with-prefixes}}
       shell: bash
+    - run: aws s3 cp s3://magiq-ncsgate-738608577325/libs/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
+      shell: bash

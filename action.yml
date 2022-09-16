@@ -1,0 +1,19 @@
+name: "Sencha Builder"
+description: "Build the frontend distribution for MAGIQ Frontend apps"
+branding:
+  icon: "message-square"
+  color: "orange"
+inputs:
+  sencha-version:
+    description: "Sencha SDK Version"
+    required: true
+  bucket-with-prefixes:
+    description: "location where the artifacts will be pushed to"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: echo ${{inputs.sencha-version}}
+      shell: bash
+    - run: echo ${{inputs.bucket-with-prefixes}}
+      shell: bash

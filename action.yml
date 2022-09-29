@@ -10,6 +10,9 @@ inputs:
   sencha-sdk-bucket:
     description: "where the SDKS are located"
     required: true
+  build-folder:
+    description: "what folder do you want the output to be in"
+    default: build
 runs:
   using: "composite"
   steps:
@@ -17,9 +20,9 @@ runs:
       shell: bash
     - run: aws s3 cp s3://${{inputs.sencha-sdk-bucket}}/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
       shell: bash
-    - run: docker build -t sencha-app --build-arg senchaVersion=${{inputs.sencha-version}} --output ./build .
+    - run: docker build -t sencha-app --build-arg senchaVersion=${{inputs.sencha-version}} --output ./${{inputs.build-folder}} .
       shell: bash
-    - run: tar -zcvf build.tar.gz build
+    - run: tar -zcvf ${{inputs.build-folder}}.tar.gz ${{inputs.build-folder}}
       shell: bash
-    - run: aws s3 cp build.tar.gz s3://${{inputs.bucket-with-prefixes}}/2.3.${{ github.run_number }}
+    - run: aws s3 cp ${{inputs.build-folder}}.tar.gz s3://${{inputs.bucket-with-prefixes}}/2.3.${{ github.run_number }}
       shell: bash

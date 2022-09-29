@@ -1,0 +1,17 @@
+## Prepend here to create main copy
+ADD . /frontend
+
+WORKDIR /frontend
+
+RUN mkdir extjs-${PACKAGE}
+
+RUN tar zxf extjs-${PACKAGE}.tgz --directory=extjs-${PACKAGE}
+
+RUN sencha app install --framework=extjs-${PACKAGE}
+
+RUN sencha --beta repo sync
+
+RUN sencha --beta app build --destination=output
+
+FROM scratch as export
+COPY --from=build /frontend/output .

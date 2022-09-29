@@ -10,6 +10,9 @@ inputs:
   sencha-sdk-bucket:
     description: "where the SDKS are located"
     required: true
+  build-files:
+    description: "required build files"
+    required: true
   build-folder:
     description: "what folder do you want the output to be in"
     default: build
@@ -17,6 +20,8 @@ runs:
   using: "composite"
   steps:
     - run: echo ${{inputs.sencha-version}}
+      shell: bash
+    - run: aws s3 cp s3://{{inputs.build-files}} . --recursive
       shell: bash
     - run: aws s3 cp s3://${{inputs.sencha-sdk-bucket}}/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
       shell: bash

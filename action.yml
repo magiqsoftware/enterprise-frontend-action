@@ -1,8 +1,5 @@
-name: "Sencha Builder"
+name: "Sencha App Builder"
 description: "Build the frontend distribution for MAGIQ Frontend apps"
-branding:
-  icon: "message-square"
-  color: "orange"
 inputs:
   sencha-version:
     description: "Sencha SDK Version"
@@ -10,12 +7,19 @@ inputs:
   bucket-with-prefixes:
     description: "location where the artifacts will be pushed to"
     required: true
+  sencha-sdk-bucket:
+    description: "where the SDKS are located"
+    required: true
 runs:
   using: "composite"
   steps:
     - run: echo ${{inputs.sencha-version}}
       shell: bash
-    - run: echo ${{inputs.bucket-with-prefixes}}
+    - run: aws s3 cp s3://${{inputs.sencha-sdk-bucket}}/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
       shell: bash
-    - run: aws s3 cp s3://magiq-ncsgate-738608577325/libs/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
+    - run: docker build -t sencha-app --build-arg senchaVersion=${{inputs.sencha-version}} --output ./build .
+      shell: bash
+    - run: tar -zcvf build.tar.gz build
+      shell: bash
+    - run: aws s3 cp build.tar.gz s3://${{inputs.bucket-with-prefixes}}/2.3.${{ github.run_number }}
       shell: bash

@@ -21,7 +21,7 @@ runs:
   steps:
     - run: echo ${{inputs.sencha-version}}
       shell: bash
-    - run: aws s3 cp s3://{{inputs.build-files}} . --recursive
+    - run: aws s3 cp s3://${{inputs.build-files}} . --recursive
       shell: bash
     - run: aws s3 cp s3://${{inputs.sencha-sdk-bucket}}/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
       shell: bash

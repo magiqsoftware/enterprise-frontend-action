@@ -20,6 +20,8 @@ runs:
       shell: bash
     - run: aws s3 cp s3://${{inputs.sencha-sdk-bucket}}/extjs-${{inputs.sencha-version}}.tgz extjs-${{inputs.sencha-version}}.tgz
       shell: bash
+    - run: cat MasterDockerfile BuildDockerfile >> Dockerfile
+      shell: bash
     - run: docker build -t sencha-app --build-arg senchaVersion=${{inputs.sencha-version}} --output ./${{inputs.build-folder}} .
       shell: bash
     - run: tar -zcvf ${{inputs.build-folder}}.tar.gz ${{inputs.build-folder}}

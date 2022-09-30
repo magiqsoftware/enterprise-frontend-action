@@ -16,6 +16,10 @@ inputs:
   build-folder:
     description: "what folder do you want the output to be in"
     default: build
+outputs:
+  aritifact:
+    description: Artifact Tag
+    value: 2.3.${{ github.run_number }} 
 runs:
   using: "composite"
   steps:

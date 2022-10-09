@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "sourceMap": true,
+      "target": "es2020",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "baseUrl": "./src",
+      "paths": {
+        "*": ["*"]
+      },
+      "noUnusedLocals": true,
+      "esModuleInterop": true
+    },
+    "include": ["./src/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  }  

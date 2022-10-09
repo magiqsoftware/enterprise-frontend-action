@@ -17,5 +17,5 @@ inputs:
     description: "what folder do you want the output to be in"
     default: build
 runs:
-  using: "node12"
-  main: "dist/index.js
+  using: 'node12'
+  main: 'dist/index.js'

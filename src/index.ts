@@ -1,9 +1,10 @@
 import * as aws from 'aws-sdk';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 import * as core from '@actions/core';
-const spawn = require('child_process').spawn;
+import compress from 'compressing';
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
 
 var credentials = null;
 const repo = process.env['GITHUB_REPOSITORY'];
@@ -79,14 +80,19 @@ const getSingleFile = async (bucketName, file) => {
     });
 };
 
-const buildPackages = async () => {
+const buildPackages = async (senchaVersion) => {
+    const splitByPrefix = senchaVersion.split('/');
+    const version = splitByPrefix[splitByPrefix.length - 1]
+        .replace('extjs-', '')
+        .replace('.tgz', '');
+        
     return new Promise((resolve) => {
         var ls = spawn('docker', [
             'build',
             '-t',
             'enterprise-app',
             '--build-arg',
-            'senchaVersion=7.2.0',
+            `senchaVersion=${version}`,
             '--output',
             './build',
             '.',
@@ -100,14 +106,17 @@ const buildPackages = async () => {
             console.log('stderr: ' + data.toString());
         });
         ls.on('exit', function () {
-            resolve({});
+            compress.tgz
+                .compressDir('./build', './build_files.tgz')
+                .then(() => {
+                    resolve({});
+                });
         });
     });
 };
 
 export const main = async () => {
     try {
-
         const buildFiles = core
             .getInput('build-files', { required: false })
             .split('/');
@@ -132,7 +141,7 @@ export const main = async () => {
         await getSingleFile(SdkBucket, buildSdkPrefix);
 
         core.notice('Building App');
-        await buildPackages();
+        await buildPackages(buildSdkPrefix);
     } catch (error) {
         core.setFailed(error.message);
     }

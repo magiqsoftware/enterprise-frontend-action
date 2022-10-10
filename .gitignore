@@ -3,3 +3,4 @@ node_modules
 sencha.cfg
 sencha-beta.cfg
 Dockerfile
+extjs-*

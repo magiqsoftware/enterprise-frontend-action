@@ -1,6 +1,7 @@
 import * as aws from 'aws-sdk';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 import * as core from '@actions/core';
+const spawn = require('child_process').spawn;
 import fs from 'fs';
 import path from 'path';
 
@@ -47,27 +48,91 @@ const getFiles = async (bucketName, filesList) => {
             const tempFile = fs.createWriteStream(tempFileName);
             s3.getObject({ Bucket: params.Bucket, Key: file.Key })
                 .createReadStream()
+                .on('end', () => {
+                    core.notice('Fetching Complete', file.Key);
+                    resolve({});
+                })
                 .pipe(tempFile);
-
-            core.notice('Fetching Complete', file.Key);
-            resolve({});
         });
     });
     return Promise.allSettled(writeFile);
 };
 
+const getSingleFile = async (bucketName, file) => {
+    const s3 = await getS3Bucket();
+    const params = {
+        Bucket: bucketName,
+        MaxKeys: 1,
+    };
+
+    return new Promise((resolve) => {
+        core.notice(`Fetching: ${file}`);
+        const tempFileName = path.join('./', file.split('/')[1]);
+        const tempFile = fs.createWriteStream(tempFileName);
+        s3.getObject({ Bucket: params.Bucket, Key: file })
+            .createReadStream()
+            .on('end', () => {
+                core.notice(`Fetching: ${file} completed`);
+                resolve({});
+            })
+            .pipe(tempFile);
+    });
+};
+
+const buildPackages = async () => {
+    return new Promise((resolve) => {
+        var ls = spawn('docker', [
+            'build',
+            '-t',
+            'enterprise-app',
+            '--build-arg',
+            'senchaVersion=7.2.0',
+            '--output',
+            './build',
+            '.',
+        ]);
+
+        ls.stdout.on('data', function (data) {
+            console.log('stdout: ' + data.toString());
+        });
+
+        ls.stderr.on('data', function (data) {
+            console.log('stderr: ' + data.toString());
+        });
+        ls.on('exit', function () {
+            resolve({});
+        });
+    });
+};
+
 export const main = async () => {
     try {
+
         const buildFiles = core
             .getInput('build-files', { required: false })
             .split('/');
-        //build bucket and prefix
-        const bucketName = buildFiles[0];
-        const prefix = buildFiles[1];
 
-        const theDataFiles = await getS3FilesList(bucketName, prefix);
+        const SdkBucket = core.getInput('sdk-bucket');
+        const buildSdkPrefix = core.getInput('sdk-prefix-with-file');
+
+        //build bucket and prefix
+        const buildFilesbucketName = buildFiles[0];
+        const buildFilesprefix = buildFiles[1];
+
+        const theDataFiles = await getS3FilesList(
+            buildFilesbucketName,
+            buildFilesprefix
+        );
+
         core.notice('Downloading required build files');
-        await getFiles(bucketName, theDataFiles);
+        await getFiles(buildFilesbucketName, theDataFiles);
+
+        // get theSDK
+        core.notice('Downloading SDK');
+        await getSingleFile(SdkBucket, buildSdkPrefix);
+
+        core.notice('Building App');
+        await buildPackages();
     } catch (error) {
         core.setFailed(error.message);
     }

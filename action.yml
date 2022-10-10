@@ -1,17 +1,17 @@
 name: "Sencha App Builder"
 description: "Build the frontend distribution for MAGIQ Frontend apps"
 inputs:
-  sencha-version:
+  sdk-prefix-with-file:
     description: "Sencha SDK Version"
     required: true
-  bucket-with-prefixes:
-    description: "location where the artifacts will be pushed to"
-    required: true
-  sencha-sdk-bucket:
+  sdk-bucket:
     description: "where the SDKS are located"
     required: true
   build-files:
     description: "required build files"
+    required: true
+  bucket-with-prefixes:
+    description: "location where the artifacts will be pushed to"
     required: true
   build-folder:
     description: "what folder do you want the output to be in"

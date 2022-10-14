@@ -4,7 +4,9 @@
   "description": "Action that can be used across frontend sites to build and push to a bucket",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf ./dist && webpack"
+    "build": "rm -rf ./dist && webpack",
+    "lint": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --quiet",
+    "lint:fix": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --fix --quiet"
   },
   "keywords": [],
   "author": "MAGIQ Software Development",

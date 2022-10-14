@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 
-var credentials = null;
+let credentials = null;
 const repo = process.env['GITHUB_REPOSITORY'];
 
 const getS3Bucket = async () => {
@@ -27,7 +27,7 @@ export const getS3FilesList = async (bucketName, prefix) => {
     return new Promise((resolve) => {
         s3.listObjects(params, (err, data) => {
             const filteredWithPrefix = data.Contents.filter(
-                (i) => i.Key !== prefix + '/'
+                (i) => i.Key !== prefix + '/',
             ); // so that it does not try to fetch the prefix itself
             resolve(filteredWithPrefix);
         });
@@ -81,7 +81,7 @@ export const getSingleFile = async (bucketName, file) => {
 export const buildPackages = async (
     senchaVersion,
     buildOutputFolder,
-    enviro
+    enviro,
 ) => {
     const splitByPrefix = senchaVersion.split('/');
     const version = splitByPrefix[splitByPrefix.length - 1]
@@ -91,7 +91,7 @@ export const buildPackages = async (
     const dockerFile = enviro == 'prod' ? 'Dockerfile-Prod' : 'Dockerfile-Dev';
 
     return new Promise((resolve) => {
-        var ls = spawn('docker', [
+        const ls = spawn('docker', [
             'build',
             '-t',
             'enterprise-app',
@@ -115,7 +115,7 @@ export const buildPackages = async (
             compress.tgz
                 .compressDir(
                     `./${buildOutputFolder}`,
-                    `./${buildOutputFolder}.tgz`
+                    `./${buildOutputFolder}.tgz`,
                 )
                 .then(() => {
                     resolve({});
@@ -171,7 +171,7 @@ export const main = async () => {
 
         const theDataFiles = await getS3FilesList(
             buildFilesbucketName,
-            buildFilesprefix
+            buildFilesprefix,
         );
 
         core.notice('Downloading required build files');

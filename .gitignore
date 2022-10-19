@@ -4,3 +4,4 @@ sencha.cfg
 sencha-beta.cfg
 Dockerfile*
 extjs-*
+.DS_Store

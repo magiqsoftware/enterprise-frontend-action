@@ -116,6 +116,7 @@ export const buildPackages = async (
                 .compressDir(
                     `./${buildOutputFolder}`,
                     `./${buildOutputFolder}.tgz`,
+                    { ignoreBase: true },
                 )
                 .then(() => {
                     resolve({});

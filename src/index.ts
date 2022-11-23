@@ -5,9 +5,13 @@ import compress from 'compressing';
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
+// import { execPath } from 'process';
 
 let credentials = null;
 const repo = process.env['GITHUB_REPOSITORY'];
+
+export const setInput = (name, value) =>
+    (process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] = value);
 
 const getS3Bucket = async () => {
     if (repo) {
@@ -80,6 +84,7 @@ export const getSingleFile = async (bucketName, file) => {
 
 export const buildPackages = async (
     senchaVersion,
+    epaPrefix,
     buildOutputFolder,
     enviro,
 ) => {
@@ -88,7 +93,7 @@ export const buildPackages = async (
         .replace('extjs-', '')
         .replace('.tgz', '');
 
-    const dockerFile = enviro == 'prod' ? 'Dockerfile-Prod' : 'Dockerfile-Dev';
+    const dockerFile = (enviro == 'prod' ? 'Dockerfile-Prod' : 'Dockerfile-Dev') + (epaPrefix == '' ? '' : '-epa');
 
     return new Promise((resolve) => {
         const ls = spawn('docker', [
@@ -158,8 +163,9 @@ export const main = async () => {
         const buildFiles = core
             .getInput('build-files', { required: false })
             .split('/');
-
+        
         const SdkBucket = core.getInput('sdk-bucket');
+        const epaPrefix = core.getInput('epa-prefix-with-file');
         const buildSdkPrefix = core.getInput('sdk-prefix-with-file');
         const artifactBucket = core.getInput('artifact-bucket');
         const artifactPrefix = core.getInput('artifact-prefix');
@@ -181,12 +187,16 @@ export const main = async () => {
         // get theSDK
         core.notice('Downloading SDK');
         await getSingleFile(SdkBucket, buildSdkPrefix);
+        
+        if (epaPrefix != ''){
+            await getSingleFile(SdkBucket, epaPrefix);
+        }
 
         // build the app
         core.notice('Building App');
-        await buildPackages(buildSdkPrefix, buildOutputFolder, enviro);
+        await buildPackages(buildSdkPrefix, epaPrefix, buildOutputFolder, enviro);
 
-        //push to the bucket
+        // push to the bucket
         await uploadToS3(artifactBucket, artifactPrefix, buildOutputFolder);
     } catch (error) {
         core.setFailed(error.message);

@@ -22,6 +22,9 @@ inputs:
   environment-build:
     description: is a production build
     default: "dev"
+  use-epa:
+    description: "epa version (if any)"
+    default: ""
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -22,7 +22,7 @@ inputs:
   environment-build:
     description: is a production build
     default: "dev"
-  use-epa:
+  epa-prefix-with-file:
     description: "epa version (if any)"
     default: ""
 runs:

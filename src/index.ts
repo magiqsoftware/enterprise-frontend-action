@@ -188,7 +188,6 @@ export const main = async () => {
         core.notice('Downloading SDK');
         await getSingleFile(SdkBucket, buildSdkPrefix);
         if(epaPrefix.trim() != ""){
-            core.notice('inside if clause!');
             await getSingleFile(SdkBucket, epaPrefix);
         }
 

@@ -181,7 +181,7 @@ export const main = async () => {
             buildFilesprefix,
         );
 
-        core.notice('Downloading required build files');
+        core.notice(`Downloading required build files`);
         await getFiles(buildFilesbucketName, theDataFiles);
 
         // get theSDK

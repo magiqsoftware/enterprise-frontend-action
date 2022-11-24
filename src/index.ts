@@ -181,14 +181,14 @@ export const main = async () => {
             buildFilesprefix,
         );
 
-        core.notice(`Downloading required build files`);
+        core.notice('Downloading required build files');
         await getFiles(buildFilesbucketName, theDataFiles);
 
         // get theSDK
         core.notice('Downloading SDK');
         await getSingleFile(SdkBucket, buildSdkPrefix);
         if(epaPrefix != ""){
-            core.notice("inside if clause!");
+            core.notice('inside if clause!');
             await getSingleFile(SdkBucket, epaPrefix);
         }
 

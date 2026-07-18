@@ -26,6 +26,6 @@ inputs:
     description: "epa version (if any)"
     default: ""
 runs:
-  using: 'node16'
+  using: 'node24'
   main: 'dist/index.js'
   post: 'dist/cleanup.js'

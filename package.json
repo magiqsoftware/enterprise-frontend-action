@@ -3,6 +3,9 @@
   "version": "1.0.5",
   "description": "Action that can be used across frontend sites to build and push to a bucket",
   "main": "dist/index.js",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "rm -rf ./dist && webpack",
     "lint": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --quiet",
@@ -20,7 +23,7 @@
     "compressing": "^1.6.2"
   },
   "devDependencies": {
-    "@types/node": "^14.14.31",
+    "@types/node": "^24.13.3",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
     "eslint": "^8.24.0",

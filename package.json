@@ -11,7 +11,12 @@
     "lint": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --quiet",
     "lint:fix": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --fix --quiet"
   },
-  "keywords": [],
+  "keywords": [
+    "github",
+    "actions",
+    "enterprise",
+    "frontend"
+  ],
   "author": "MAGIQ Software Development",
   "license": "ISC",
   "dependencies": {

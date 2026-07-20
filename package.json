@@ -8,8 +8,8 @@
   },
   "scripts": {
     "build": "rm -rf ./dist && webpack",
-    "lint": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --quiet",
-    "lint:fix": "eslint \"**/*.ts\" --ignore-pattern \"**/*.d.ts\" --fix --quiet"
+    "lint": "eslint \"src/**/*.ts\" --quiet",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix --quiet"
   },
   "keywords": [
     "github",
@@ -28,16 +28,16 @@
     "compressing": "^1.6.2"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.3",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
-    "@typescript-eslint/parser": "^5.39.0",
-    "eslint": "^8.24.0",
+    "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-watch": "^8.0.0",
-    "prettier": "^2.7.1",
+    "eslint-plugin-prettier": "^5.5.6",
+    "globals": "^17.0.0",
+    "prettier": "^3.9.5",
     "ts-loader": "^9.4.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.64.0",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0"
   }

@@ -1,4 +1,8 @@
 # **enterprise-frontend-action**
+
+[![CI](https://github.com/magiqsoftware/enterprise-frontend-action/actions/workflows/ci.yml/badge.svg)](https://github.com/magiqsoftware/enterprise-frontend-action/actions/workflows/ci.yml)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
 Definition of actions required to build the frontend artifacts
 
 ## **Required Parameters**

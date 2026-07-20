@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.0.0](https://github.com/magiqsoftware/enterprise-frontend-action/compare/1.0.8...2.0.0) (2026-07-21)
+## [2.0.0](https://github.com/magiqsoftware/enterprise-frontend-action/compare/1.0.8...v2.0.0) (2026-07-21)
 
 ### Features
 

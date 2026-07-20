@@ -24,7 +24,7 @@
     "@aws-sdk/client-s3": "^3.1090.0",
     "@aws-sdk/credential-provider-sso": "^3.973.3",
     "@aws-sdk/lib-storage": "^3.1090.0",
-    "compressing": "^1.6.2"
+    "compressing": "^2.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

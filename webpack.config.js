@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'production',
@@ -27,4 +28,9 @@ module.exports = {
       },
     ],
   },
+  // Force each entry into a single self-contained file. AWS SDK v3 uses
+  // dynamic import() (deferred credential loading), which webpack would
+  // otherwise emit as separate chunk files; a GitHub Action ships one file
+  // per entry, so inline them.
+  plugins: [new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
 };

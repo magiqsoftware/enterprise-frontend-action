@@ -1,6 +1,6 @@
 {
   "name": "enterprise-frontend-action",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "Action that can be used across frontend sites to build and push to a bucket",
   "main": "dist/index.js",
   "engines": {

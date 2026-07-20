@@ -27,5 +27,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify dist is up to date
+        # The action runs the committed bundle, so it must match a fresh
+        # build of src/. Only the runtime files are checked — source maps
+        # are not byte-reproducible across environments.
+        run: git diff --exit-code -- dist/index.js dist/cleanup.js
+
       - name: Lint
         run: npm run lint

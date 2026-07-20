@@ -1,10 +1,16 @@
-import * as aws from 'aws-sdk';
+import {
+  S3Client,
+  ListObjectsV2Command,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 import * as core from '@actions/core';
 import compress from 'compressing';
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
+import { Readable } from 'stream';
 
 let credentials = null;
 const repo = process.env['GITHUB_REPOSITORY'];
@@ -14,47 +20,43 @@ export const setInput = (name, value) =>
 
 const getS3Bucket = async () => {
   if (repo) {
-    return new aws.S3({});
+    return new S3Client({});
   }
   credentials = await fromSSO({ profile: process.argv[2] })();
-  return new aws.S3({ credentials });
+  return new S3Client({ credentials });
 };
 
 export const getS3FilesList = async (bucketName, prefix) => {
   const s3 = await getS3Bucket();
-  const params = {
-    Bucket: bucketName,
-    MaxKeys: 10,
-    Prefix: prefix,
-  };
-  return new Promise((resolve) => {
-    s3.listObjects(params, (err, data) => {
-      const filteredWithPrefix = data.Contents.filter(
-        (i) => i.Key !== prefix + '/',
-      ); // so that it does not try to fetch the prefix itself
-      resolve(filteredWithPrefix);
-    });
-  });
+  const data = await s3.send(
+    new ListObjectsV2Command({
+      Bucket: bucketName,
+      MaxKeys: 10,
+      Prefix: prefix,
+    }),
+  );
+  // so that it does not try to fetch the prefix itself
+  return (data.Contents ?? []).filter((i) => i.Key !== prefix + '/');
 };
 
 export const getFiles = async (bucketName, filesList) => {
   const s3 = await getS3Bucket();
-  const params = {
-    Bucket: bucketName,
-    MaxKeys: 10,
-  };
-  const writeFile = filesList.map((file) => {
-    return new Promise((resolve) => {
-      core.notice(`Fetching ${file.Key}`);
-      const tempFileName = path.join('./', file.Key.split('/')[1]);
-      const tempFile = fs.createWriteStream(tempFileName);
-      s3.getObject({ Bucket: params.Bucket, Key: file.Key })
-        .createReadStream()
-        .on('end', () => {
+  const writeFile = filesList.map(async (file) => {
+    core.notice(`Fetching ${file.Key}`);
+    const tempFileName = path.join('./', file.Key.split('/')[1]);
+    const tempFile = fs.createWriteStream(tempFileName);
+    const { Body } = await s3.send(
+      new GetObjectCommand({ Bucket: bucketName, Key: file.Key }),
+    );
+    await new Promise((resolve, reject) => {
+      (Body as Readable)
+        .on('error', reject)
+        .pipe(tempFile)
+        .on('finish', () => {
           core.notice(`Fetching Complete ${file.Key}`);
           resolve({});
         })
-        .pipe(tempFile);
+        .on('error', reject);
     });
   });
   return Promise.allSettled(writeFile);
@@ -62,22 +64,21 @@ export const getFiles = async (bucketName, filesList) => {
 
 export const getSingleFile = async (bucketName, file) => {
   const s3 = await getS3Bucket();
-  const params = {
-    Bucket: bucketName,
-    MaxKeys: 1,
-  };
-
-  return new Promise((resolve) => {
-    core.notice(`Fetching: ${file}`);
-    const tempFileName = path.join('./', file.split('/')[1]);
-    const tempFile = fs.createWriteStream(tempFileName);
-    s3.getObject({ Bucket: params.Bucket, Key: file })
-      .createReadStream()
-      .on('end', () => {
+  core.notice(`Fetching: ${file}`);
+  const tempFileName = path.join('./', file.split('/')[1]);
+  const tempFile = fs.createWriteStream(tempFileName);
+  const { Body } = await s3.send(
+    new GetObjectCommand({ Bucket: bucketName, Key: file }),
+  );
+  return new Promise((resolve, reject) => {
+    (Body as Readable)
+      .on('error', reject)
+      .pipe(tempFile)
+      .on('finish', () => {
         core.notice(`Fetching: ${file} completed`);
         resolve({});
       })
-      .pipe(tempFile);
+      .on('error', reject);
   });
 };
 
@@ -134,27 +135,28 @@ export const buildPackages = async (
 
 export const uploadToS3 = async (bucket, artifactLocation, buildFileName) => {
   const s3 = await getS3Bucket();
+
   const fileStream = fs.createReadStream(`./${buildFileName}.tgz`);
-  return new Promise((resolve) => {
-    s3.upload({
+  await new Upload({
+    client: s3,
+    params: {
       Bucket: bucket,
       Key: `${artifactLocation}/${buildFileName}.tgz`,
       Body: fileStream,
-    })
-      .promise()
-      .then(() => {
-        const latest = fs.createReadStream(`./${buildFileName}.tgz`);
-        s3.upload({
-          Bucket: bucket,
-          Key: `${artifactLocation}/latest.tgz`,
-          Body: latest,
-        })
-          .promise()
-          .then(() => {
-            resolve({});
-          });
-      });
-  });
+    },
+  }).done();
+
+  const latest = fs.createReadStream(`./${buildFileName}.tgz`);
+  await new Upload({
+    client: s3,
+    params: {
+      Bucket: bucket,
+      Key: `${artifactLocation}/latest.tgz`,
+      Body: latest,
+    },
+  }).done();
+
+  return {};
 };
 
 export const main = async () => {

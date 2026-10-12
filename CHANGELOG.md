@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/magiqsoftware/enterprise-frontend-action/compare/v2.0.0...v2.0.1) (2026-10-13)
+
+### Bug Fixes
+
+- bump minor npm dependencies (`@aws-sdk/client-s3`, `@aws-sdk/lib-storage`, `compressing`, and dev tooling) ([#30](https://github.com/magiqsoftware/enterprise-frontend-action/pull/30))
+- rebuild the bundled `dist/` output with the updated dependencies ([#31](https://github.com/magiqsoftware/enterprise-frontend-action/pull/31))
+
 ## [2.0.0](https://github.com/magiqsoftware/enterprise-frontend-action/compare/1.0.8...v2.0.0) (2026-07-21)
 
 ### Features
